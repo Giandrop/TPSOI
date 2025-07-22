@@ -1,45 +1,7 @@
 -module(p2p_node).
--export([init_node/0]).
-
-generate_ID() ->
-    1.
-
-% Proceso que se encarga de enviar un id y esperar un invalid_name o timeout
-id_requester(Port, Socket, Try_id) ->
-    BroadcastAddr = {255,255,255,255},
-    gen_udp:send(Socket, BroadcastAddr, Port, <<"NAME_REQUEST ", Try_id>>),
-
-% Se queda escuchando durante 45 segundos si algun otro proceso le dice algo
-    receive
-        {id_fail, Fail_Id} ->
-            %Mostrar en pantalla que cual Id fallo
-            NewId = generate_ID(),
-            id_requester(Port, Socket, NewId)
-    after
-        45000 -> %setear id 
-            Try_id %Ver como pasar esto
-    end.
-
-udp_listener(Socket, Broad_PID) ->
-    case gen_udp:recv(Socket) of
-        {NAME_REQUEST, Pretended_Id} ->
-            %Confirmarte si es valido
-            % Tengo dos opciones:
-            %   -Si el ID no es valido, le mando {invalid_name, Pretended_Id}.
-            %   -No le mando nada.
-            udp_listener(Socket, Broad_PID),
-            true;
-        {HELLO, Id, Ip, PORT} ->
-            %   Almaceno info en know_nodes.json
-            udp_listener(Socket, Broad_PID),
-            true;
-        {invalid_name, Fail_Id} ->
-            
-            Broad_PID ! {id_fail, Fail_Id},
-        
-            udp_listener(Socket,Broad_PID),
-            true
-    end.
+-imUDP_PORT(p2p_utils, [generate_ID/0]).
+-imUDP_PORT(p2p_udp, [id_requester/3, udp_listener/2, udp_announcement/2]).
+-exUDP_PORT([init_node/0]).
 
 init_node( ) -> 
     %[Obtener id unico]
@@ -54,13 +16,25 @@ init_node( ) ->
     %[Inicializo archivo de nodos conocidos]
     Pid_RW = file:open("./know_nodes.json", [write]),
     
-    %Socket Connect via UDP
-    PORT = 12345,
-    Socket = gen_udp:open( PORT, [{broadcast, true}]),
+    %---------------------------------------------------------------------------------------------
+    UDP_PORT = 12346,
+    TCP_PORT = 12345,
+    
+    BroadcastAddr = {255,255,255,255},
+    Socket = gen_udp:open( UDP_PORT, [{broadcast, true}]),
 
-    Pid_Broad = spawn(p2p_node, id_requester, [PORT, Socket, NewId]),
+    Pid_id_requester = spawn(p2p_udp, id_requester, [UDP_PORT, Socket, BroadcastAddr]),
 
-    Pid_UDP_Listener = spawn(p2p_node, udp_listener, [Socket, Pid_Broad]).
+    Pid_udp_listener = spawn(p2p_udp, udp_listener, [Socket, Pid_id_requester]),
+    Pid_tcp_listener = spawn(p2p_tcp, tcp_listener, []),
+
+    %Proceso encargado de enviar los HELLO de forma periodica.
+    Pid_udp_announcement = spawn(p2p_udp, udp_announcement, [Socket, UDP_PORT, TCP_PORT]).
+
+    %---------------------------------------------------------------------------------------------
+    %Conexiones via TCP
+
+    %---------------------------------------------------------------------------------------------
 
     
 %TODO
