@@ -1,0 +1,13 @@
+{
+    "[_id del nodo1]": 
+                {"ip": "ip_number",
+                "PORT": "PORT_NUMBER"},
+
+    "[_id del nodo2]": 
+                {"ip": "ip_number",
+                "PORT": "PORT_NUMBER"},
+
+    "[_id del nodo3]": 
+                {"ip": "ip_number",
+                "PORT": "PORT_NUMBER"}
+}
