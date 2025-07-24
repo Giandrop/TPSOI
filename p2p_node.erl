@@ -1,7 +1,7 @@
 -module(p2p_node).
--imUDP_PORT(p2p_utils, [generate_ID/0]).
--imUDP_PORT(p2p_udp, [id_requester/3, udp_listener/2, udp_announcement/2]).
--exUDP_PORT([init_node/0]).
+-import(p2p_utils, [generate_ID/0]).
+-import(p2p_udp, [id_requester/3, udp_listener/2, udp_announcement/2]).
+-export([init_node/0]).
 
 init_node( ) -> 
     %[Obtener id unico]
@@ -21,11 +21,12 @@ init_node( ) ->
     TCP_PORT = 12345,
     
     BroadcastAddr = {255,255,255,255},
-    Socket = gen_udp:open( UDP_PORT, [{broadcast, true}]),
+    {ok, Socket} = gen_udp:open( UDP_PORT, [binary, {active, true}, {broadcast, true}]),
 
-    Pid_id_requester = spawn(p2p_udp, id_requester, [UDP_PORT, Socket, BroadcastAddr]),
+    Pid_id_manager   = spawn(p2p_udp, id_manager, [no_id, []]),
+    Pid_id_requester = spawn(p2p_udp, id_requester, [Pid_id_manager, UDP_PORT, Socket, BroadcastAddr]),
 
-    Pid_udp_listener = spawn(p2p_udp, udp_listener, [Socket, Pid_id_requester]),
+    Pid_udp_listener = spawn(p2p_udp, udp_listener, [Socket, Pid_id_requester, Pid_id_manager]),
     Pid_tcp_listener = spawn(p2p_tcp, tcp_listener, []),
 
     %Proceso encargado de enviar los HELLO de forma periodica.
@@ -35,10 +36,3 @@ init_node( ) ->
     %Conexiones via TCP
 
     %---------------------------------------------------------------------------------------------
-
-    
-%TODO
-% Comunicación TCP con la red
-% Ver como devolver que el Id pretendido es valido
-% Ver como generar Ids
-% Como escribir en .json con erlang
