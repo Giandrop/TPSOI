@@ -2,9 +2,10 @@
 
 ##TODO
 - Comunicación TCP con la red
-- Ver como devolver que el Id pretendido es valido
-- Ver como generar Ids
 - Como escribir en .json con erlang
+- Usar registro de procesos en lugar de pasarlos como parámetros!
+- Ver si hay que darle prioridad a algún proceso particular?
+
 
 
 ## Guía de procesos

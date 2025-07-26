@@ -20,14 +20,14 @@ init_node( ) ->
     UDP_PORT = 12346,
     TCP_PORT = 12345,
     
-    BroadcastAddr = {255,255,255,255},
-    {ok, Socket} = gen_udp:open( UDP_PORT, [binary, {active, true}, {broadcast, true}]),
+    {ok, Socket} = gen_udp:open( UDP_PORT, [binary, {active, false}, {broadcast, true}]),
 
     Pid_id_manager   = spawn(p2p_udp, id_manager, [no_id, []]),
-    Pid_id_requester = spawn(p2p_udp, id_requester, [Pid_id_manager, UDP_PORT, Socket, BroadcastAddr]),
+    register(id_manager, Pid_id_manager),
+    Pid_id_requester = spawn(p2p_udp, id_requester, [UDP_PORT, Socket]),
 
-    Pid_udp_listener = spawn(p2p_udp, udp_listener, [Socket, Pid_id_requester, Pid_id_manager]),
-    Pid_tcp_listener = spawn(p2p_tcp, tcp_listener, []),
+    Pid_udp_listener = spawn(p2p_udp, udp_listener, [Socket, Pid_id_requester]),
+    % Pid_tcp_listener = spawn(p2p_tcp, tcp_listener, []),
 
     %Proceso encargado de enviar los HELLO de forma periodica.
     Pid_udp_announcement = spawn(p2p_udp, udp_announcement, [Socket, UDP_PORT, TCP_PORT]).
