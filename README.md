@@ -1,12 +1,29 @@
 # TPSOI
 
+```sh
+make
+erl
+```
+
+```erlang
+p2p_node:init_node().
+```
+
 ##TODO
 - Comunicación TCP con la red
 - Como escribir en .json con erlang
+  - Hay varias librerías de terceros para manipular JSONs pero instalar librerías de Erlang
+  parece que es algo no recomendado https://stackoverflow.com/a/26663511
+  - La última versión (OTP 27) de Erlang tiene funciones para manipular JSONs, pero es una
+  versión que no viene instalada en Ubuntu.
+  - La otra opción es hacer un parser sencillito y mantener un formato más estricto que el
+  de JSON para mantener la lista de nodos. Ej: un .txt con NODE_ID IP PORT
 - Usar registro de procesos en lugar de pasarlos como parámetros!
 - Ver si hay que darle prioridad a algún proceso particular?
-
-
+- Tener una flag para responder mensajes UDP a un puerto que no sea el de escucha
+  (para poder testear los paquetes con netcat)
+- CLI: Ver si se puede hacer solo exportando funciones de Erlang (export[id_nodo/0,...])
+  o si hay que hacer una shell propia (https://www.erlang.org/doc/apps/stdlib/custom_shell.html)
 
 ## Guía de procesos
 init_node           -- Se encarga de crear todos los demás proceso
@@ -14,4 +31,7 @@ init_node           -- Se encarga de crear todos los demás proceso
 ├─── id_requester       -- Se encarga de conseguir un id válido para el nodo
 ├─── udp_announcement   -- Anuncia periódicamente mediante broadcast el id del nodo
 ├─── udp_listener   -- Se encarga de escuchar el puerto UDP y delegar mensajes
-├─── tcp_listenrer  -- Se encarga de escuchar el puerto TCP
+├─── tcp_listener   -- Se encarga de escuchar el puerto TCP
+├─── registry       -- Mantiene la lista de nodos conocidos y la guarda en un archivo
+├─── file_proc      -- Garantiza el acceso exclusivo a la lista de archivos
+

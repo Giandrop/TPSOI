@@ -86,11 +86,16 @@ udp_listener(Socket, Broad_PID) ->
             end,
             udp_listener(Socket, Broad_PID);
         {ok, {Addr, Port, <<"HELLO ", IdBin:32/bitstring, " ", PortTCPBinN/binary>>}} ->
-            Id = binary_to_list(IdBin),
-            [PortTCPBin, <<>>] = binary:split(PortTCPBinN, <<"\n">>),
-            PortTCP = binary_to_integer(PortTCPBin),
-            %   Almaceno info en know_nodes.json
-            io:format("MSG from ~w:~w HELLO ~s ~w ~n", [Addr, Port, Id, PortTCP]),
+            Addrs = ips(),
+            case lists:member(Addr, Addrs) of
+                true -> ok;
+                false ->
+                    Id = binary_to_list(IdBin),
+                    [PortTCPBin, <<>>] = binary:split(PortTCPBinN, <<"\n">>),
+                    PortTCP = binary_to_integer(PortTCPBin),
+                    registry_id ! {update, Id, Addr, PortTCP},
+                    io:format("MSG from ~w:~w HELLO ~s ~w ~n", [Addr, Port, Id, PortTCP])
+            end,
             udp_listener(Socket, Broad_PID);
         {ok, {Addr, Port, <<"INVALID_NAME ", IdBin:32/bitstring, "\n">>}} ->
             Id = binary_to_list(IdBin),
