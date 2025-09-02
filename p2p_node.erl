@@ -1,7 +1,7 @@
 -module(p2p_node).
 -import(p2p_utils, [generate_ID/0]).
 -import(p2p_udp, [id_requester/3, udp_listener/2, udp_announcement/2]).
--export([init_node/0, registry/1, read_registry/0, write_registry/1]).
+-export([init_node/0, registry/1, read_registry/0, write_registry/1, file_proc/0]).
 
 -define(REGISTRY, "./know_nodes.txt").
 
@@ -100,7 +100,7 @@ init_node( ) ->
     %Conexiones via TCP
 
     %---------------------------------------------------------------------------------------------
-    Pid_tcp_supervisor = spawn(p2p_tcp_supervisor, tcp_supervisor, [TCP_PORT]),
+    Pid_tcp_supervisor = spawn(p2p_tcp_supervisor, tcp_supervisor, [TCP_PORT]).
     % spawnea un supervisor que crea el socket de escucha y 
     % a su vez spawnea procesos que aceptan conexiones y se la pasa a un proceso que maneja
     % los mensajes. No es exactamente como dice en el enunciado pero creo que con un supervisor

@@ -1,5 +1,5 @@
 -module(p2p_tcp_client).
--export([tcp_client/0, tcp_connection/5]).
+-export([tcp_client/0, tcp_connection/6]).
 
 tcp_connection(NodeId, Addr, Port, MyId, SearchTerm, SupPid) ->
     % Por cada uno:

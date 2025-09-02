@@ -11,6 +11,9 @@ listar_mis_archivos() ->
     File_PID ! {self(), list_dir_all},
     receive {File_PID, List} -> List end.
 
-buscar(Filename) ->
-    % FOUND
-    end. 
+buscar(SearchTerm) -> 
+    % Matchear filename con lista local
+    % List,
+    % Matches = [Filename || Filename <- List, re:run(Filename, SearchTerm) =/= nomatch],
+    % tcp_client(),
+    ok.

@@ -35,10 +35,16 @@ whereis(tcp_client) ! {search, "FILE*"}.
 - CLI: Ver si se puede hacer solo exportando funciones de Erlang (export[id_nodo/0,...])
   o si hay que hacer una shell propia (https://www.erlang.org/doc/apps/stdlib/custom_shell.html)
   - Problema: https://www.erlang.org/doc/system/example
-  - Quizás sea más conveniente implementar la CLI en C y hacer que de alguna manera se comunique
-    con los procesos en Erlang: https://www.erlang.org/docs/22/tutorial/cnode.html
+  - Quizás sea más conveniente implementar la CLI en C y hacer que de alguna manera se 
+    comunique con los procesos en Erlang: https://www.erlang.org/docs/22/tutorial/cnode.html
   - O usando "puertos" (https://www.erlang.org/doc/system/c_port.html)
 - Ver tcp_client. Debería ser un proceso como los demás o una función que se spawne a piacere?
+- Búsqueda de archivos. En el enunciado la búsqueda se hace con <nombre_archivo_con_wildcards>
+  O sea que podría tener algún asterisco para matchear cualquier string.
+  Se puede matchear con re pero habría que adaptar el string (ej de "Filename*.txt" a 
+  "Filename.*\.txt") y escapar todos los caracteres que interactúan con un regex ?
+  Se puede user filelib:wildcard(Wildcard, Cwd) para matchear directamente en archivos 
+  pero no es seguro: alguien podría buscar "../**" para matchear cosas fuera del directorio.
 
 ## Guía de procesos
 init_node           -- Se encarga de crear todos los demás proceso
