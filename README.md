@@ -9,6 +9,16 @@ erl
 p2p_node:init_node().
 ```
 
+Prueba de clientes concurrentes:
+```sh
+for i in {1..10}; do nc localhost 12345 & done;
+```
+
+p2p_node:init_node(),
+whereis(registry_id) ! {update, "AAAA", {127,0,0,1}, 12348}.
+
+whereis(tcp_client) ! {search, "FILE*"}.
+
 ##TODO
 - Comunicación TCP con la red
 - Como escribir en .json con erlang
@@ -24,6 +34,11 @@ p2p_node:init_node().
   (para poder testear los paquetes con netcat)
 - CLI: Ver si se puede hacer solo exportando funciones de Erlang (export[id_nodo/0,...])
   o si hay que hacer una shell propia (https://www.erlang.org/doc/apps/stdlib/custom_shell.html)
+  - Problema: https://www.erlang.org/doc/system/example
+  - Quizás sea más conveniente implementar la CLI en C y hacer que de alguna manera se comunique
+    con los procesos en Erlang: https://www.erlang.org/docs/22/tutorial/cnode.html
+  - O usando "puertos" (https://www.erlang.org/doc/system/c_port.html)
+- Ver tcp_client. Debería ser un proceso como los demás o una función que se spawne a piacere?
 
 ## Guía de procesos
 init_node           -- Se encarga de crear todos los demás proceso

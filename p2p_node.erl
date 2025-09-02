@@ -44,6 +44,9 @@ registry(Map) ->
             NewMap = maps:put(Id, {Addr, Port}, Map),
             write_registry(NewMap),
             registry(NewMap);
+        {get_list, Pid} ->
+            Pid ! {maps:to_list(Map)},
+            registry(Map);
         _ -> registry(Map)
     end.
 
@@ -91,9 +94,17 @@ init_node( ) ->
     % Pid_tcp_listener = spawn(p2p_tcp, tcp_listener, []),
 
     %Proceso encargado de enviar los HELLO de forma periodica.
-    Pid_udp_announcement = spawn(p2p_udp, udp_announcement, [Socket, UDP_PORT, TCP_PORT]).
+    Pid_udp_announcement = spawn(p2p_udp, udp_announcement, [Socket, UDP_PORT, TCP_PORT]),
 
     %---------------------------------------------------------------------------------------------
     %Conexiones via TCP
 
     %---------------------------------------------------------------------------------------------
+    Pid_tcp_supervisor = spawn(p2p_tcp_supervisor, tcp_supervisor, [TCP_PORT]),
+    % spawnea un supervisor que crea el socket de escucha y 
+    % a su vez spawnea procesos que aceptan conexiones y se la pasa a un proceso que maneja
+    % los mensajes. No es exactamente como dice en el enunciado pero creo que con un supervisor
+    % es más robusto. Lo vemos
+
+    % Pid_tcp_client = spawn(p2p_tcp_client, tcp_client, []),
+    % register(tcp_client, Pid_tcp_client).
